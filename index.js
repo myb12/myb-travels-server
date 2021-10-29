@@ -12,6 +12,14 @@ app.use(express.json());
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ig1ef.mongodb.net/travelDB?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
+//======Custom function for getting all item from Database======//
+const getAllItem = async (req, res, collection) => {
+    const cursor = await collection.find({});
+    const items = await cursor.toArray();
+    res.send(items);
+}
+
+
 const run = async () => {
     try {
         await client.connect();
@@ -20,15 +28,12 @@ const run = async () => {
         const serviceCollection = database.collection("services");
         const orderCollection = database.collection("orders");
 
-        //======GET all service API======// 
+        //======GET API for all services======// 
         app.get('/services', async (req, res) => {
-            const cursor = await serviceCollection.find({});
-            const services = await cursor.toArray();
-            console.log(services);
-            res.send(services);
+            getAllItem(req, res, serviceCollection)
         })
 
-        //======GET single service by id API======// 
+        //======GET API for single service by id ======//
         app.get('/services/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
@@ -50,9 +55,42 @@ const run = async () => {
             const { email } = req.query;
             const query = { email: email };
             const orders = await orderCollection.find(query).toArray();
-            console.log(orders);
 
             res.json(orders);
+        })
+
+        //=====DELETE API for my-orders======//
+        app.delete('/my-orders/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+
+            const result = await orderCollection.deleteOne(query);
+
+            res.json(result);
+        })
+
+
+        //======GET API for all orders======// 
+        app.get('/all-orders', async (req, res) => {
+            getAllItem(req, res, orderCollection);
+        })
+
+        //======PUT API to update order status======//
+        app.put('/orders/:id', async (req, res) => {
+            const id = req.params.id;
+
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+
+            const updateDoc = {
+                $set: {
+                    orderStatus: "Approved",
+                },
+            };
+
+            const result = await orderCollection.updateOne(filter, updateDoc, options);
+
+            res.json(result);
         })
     } finally {
         // await client.close();
