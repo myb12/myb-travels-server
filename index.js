@@ -33,6 +33,15 @@ const run = async () => {
             getAllItem(req, res, serviceCollection)
         })
 
+        //======POST API for adding a service======// 
+        app.post('/services', async (req, res) => {
+            const service = req.body;
+            const result = await serviceCollection.insertOne(service);
+            console.log(result);
+
+            res.json(result);
+        })
+
         //======GET API for single service by id ======//
         app.get('/services/:id', async (req, res) => {
             const id = req.params.id;
@@ -55,7 +64,7 @@ const run = async () => {
             const { email } = req.query;
             const query = { email: email };
             const orders = await orderCollection.find(query).toArray();
-
+            console.log(orders);
             res.json(orders);
         })
 
