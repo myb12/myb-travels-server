@@ -44,6 +44,16 @@ const run = async () => {
 
             res.json(result);
         })
+
+        //=====GET API for specific orders======//
+        app.post('/my-orders', async (req, res) => {
+            const { email } = req.query;
+            const query = { email: email };
+            const orders = await orderCollection.find(query).toArray();
+            console.log(orders);
+
+            res.json(orders);
+        })
     } finally {
         // await client.close();
     }
