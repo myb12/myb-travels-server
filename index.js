@@ -23,7 +23,6 @@ const getAllItem = async (req, res, collection) => {
 const run = async () => {
     try {
         await client.connect();
-        console.log('DB is connected');
         const database = client.db("travelDB");
         const serviceCollection = database.collection("services");
         const orderCollection = database.collection("orders");
@@ -37,7 +36,6 @@ const run = async () => {
         app.post('/services', async (req, res) => {
             const service = req.body;
             const result = await serviceCollection.insertOne(service);
-            console.log(result);
 
             res.json(result);
         })
@@ -64,7 +62,6 @@ const run = async () => {
             const { email } = req.query;
             const query = { email: email };
             const orders = await orderCollection.find(query).toArray();
-            console.log(orders);
             res.json(orders);
         })
 
