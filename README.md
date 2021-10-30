@@ -32,5 +32,5 @@
 * NodeJs
 * Express
 * MongoDB
-* Cors Miffleware
+* Cors Middleware
 * Dotenv
